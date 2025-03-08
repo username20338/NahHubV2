@@ -1,1 +1,85 @@
-# NahHubV2
+
+local redzlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/REDzHUB/RedzLibV5/main/Source.Lua"))()
+
+local Window = redzlib:MakeWindow({
+    Title = "NahHub",
+    SubTitle = "Melhor script para MM2",
+    SaveFolder = "NahHub_Config"
+})
+
+-- Abas
+local CombatTab = Window:MakeTab("Combate", "fight")
+local VisualTab = Window:MakeTab("Visual", "eye")
+local UtilityTab = Window:MakeTab("Utilitários", "tools")
+
+-- ESP (Mostra jogadores através das paredes)
+local espEnabled = false
+local function toggleESP(state)
+    espEnabled = state
+    if espEnabled then
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player ~= game.Players.LocalPlayer and player.Character then
+                local highlight = Instance.new("Highlight", player.Character)
+                highlight.FillColor = Color3.fromRGB(255, 0, 0) -- Vermelho para inimigos
+            end
+        end
+    else
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player.Character then
+                for _, obj in pairs(player.Character:GetChildren()) do
+                    if obj:IsA("Highlight") then
+                        obj:Destroy()
+                    end
+                end
+            end
+        end
+    end
+end
+
+VisualTab:AddToggle({
+    Name = "ESP",
+    Description = "Mostra jogadores através das paredes",
+    Default = false,
+    Callback = function(state)
+        toggleESP(state)
+    end
+})
+
+-- Auto Farm Coins
+local farmEnabled = false
+local function autoFarmCoins(state)
+    farmEnabled = state
+    while farmEnabled do
+        for _, coin in pairs(workspace:GetChildren()) do
+            if coin:IsA("Part") and coin.Name == "Coin" then
+                game.Players.LocalPlayer.Character:MoveTo(coin.Position)
+                wait(0.1)
+            end
+        end
+        wait(0.5)
+    end
+end
+
+UtilityTab:AddToggle({
+    Name = "Auto Farm Coins",
+    Description = "Coleta moedas automaticamente",
+    Default = false,
+    Callback = function(state)
+        autoFarmCoins(state)
+    end
+})
+
+-- Auto Pickup Gun
+UtilityTab:AddButton({
+    Name = "Auto Pickup Gun",
+    Description = "Pega a arma automaticamente se o xerife morrer",
+    Callback = function()
+        for _, item in pairs(workspace:GetChildren()) do
+            if item:IsA("Part") and item.Name == "GunDrop" then
+                game.Players.LocalPlayer.Character:MoveTo(item.Position)
+            end
+        end
+    end
+})
+
+print("NahHub carregado com sucesso!")
